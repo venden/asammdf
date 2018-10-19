@@ -19,7 +19,7 @@ Features
 * filter a subset of channels from original mdf file
 * cut measurement to specified time interval
 * convert to different mdf version
-* export to pandas, Excel, HDF5, Matlab (v4, v5 and v7.3) and CSV
+* export to pandas, Excel, HDF5, Matlab (v4, v5 and v7.3), CSV and parquet
 * merge multiple files sharing the same internal structure
 * read and save mdf version 4.10 files containing zipped data blocks
 * space optimizations for saved files (no duplicated blocks)
@@ -48,19 +48,22 @@ Major features not implemented (yet)
 
 * for version 3
 
-    * functionality related to sample reduction block
+    * functionality related to sample reduction block: the samples reduction blocks are simply ignored
     
 * for version 4
 
-    * functionality related to sample reduction block
-    * handling of channel hierarchy
-    * full handling of bus logging measurements
-    * handling of unfinished measurements (mdf 4)
+    * functionality related to sample reduction block: the samples reduction blocks are simply ignored
+    * handling of channel hierarchy: channel hierarchy is ignored
+    * full handling of bus logging measurements: currently only CAN bus logging is implemented with the
+      ability to *get* signals defined in the attached CAN database (.arxml or .dbc)
+    * handling of unfinished measurements (mdf 4): warnings are logged based on the unfinished status flags
+      but no further steps are taken to sanitize the measurement
     * full support for remaining mdf 4 channel arrays types
-    * xml schema for MDBLOCK
-    * full handling of event blocks
-    * channels with default X axis
-    * chanenls with reference to attachment
+    * xml schema for MDBLOCK: most metadata stored in the comment blocks will not be available
+    * full handling of event blocks: events are transfered to the new files (in case of calling methods 
+      that return new *MDF* objects) but no new events can be created
+    * channels with default X axis: the defaukt X axis is ignored and the channel group's master channel
+      is used
     
     
 Dependencies
@@ -80,6 +83,7 @@ optional dependencies needed for exports
 * xlsxwriter : for Excel export
 * scipy : for Matlab v4 and v5 .mat export
 * hdf5storage : for Matlab v7.3 .mat export
+* fastparquet : for parquet export
 
 other optional dependencies
 
@@ -101,3 +105,22 @@ Installation
        pip install asammdf
        # or for anaconda
        conda install -c conda-forge asammdf
+       
+Contributing
+============
+Please have a look over the [contributing guidelines](https://github.com/danielhrisca/asammdf/blob/master/CONTRIBUTING.md)
+
+Contributors
+------------
+Thanks to all who contributed with commits to *asammdf*
+
+* Julien Grave `JulienGrv <https://github.com/JulienGrv>`_.
+* Jed Frey `jed-frey <https://github.com/jed-frey>`_.
+* Mihai `yahym <https://github.com/yahym>`_.
+* Jack Weinstein `jacklev <https://github.com/jacklev>`_.
+* Isuru Fernando `isuruf <https://github.com/isuruf>`_.
+* Felix Kohlgrüber `fkohlgrueber <https://github.com/fkohlgrueber>`_.
+* Stanislav Frolov `stanifrolov <https://github.com/stanifrolov>`_.
+* Thomas Kastl `kasuteru <https://github.com/kasuteru>`_.
+* venden `venden <https://github.com/venden>`_.
+

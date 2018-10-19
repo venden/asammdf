@@ -12,15 +12,13 @@ from os import path, listdir, walk
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the README file
-long_description = open('README.rst').read()
+long_description = open('README.md', 'rb').read().decode('utf-8')
 
 with open(path.join('asammdf', 'version.py'), 'r') as f:
     for line in f:
         if line.startswith('__version__'):
             version = line.split('=')[-1].strip().strip("'")
             break
-
-print(repr(long_description))
 
 setup(
     name='asammdf',
@@ -32,6 +30,7 @@ setup(
 
     description='ASAM MDF measurement data file parser',
     long_description=long_description,
+    long_description_content_type='text/markdown',
 
     # The project's main homepage.
     url='https://github.com/danielhrisca/asammdf',
