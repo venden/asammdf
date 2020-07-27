@@ -7,21 +7,19 @@
 
 *asammdf* supports MDF versions 2 (.dat), 3 (.mdf) and 4 (.mf4).
 
-*asammdf* works on Python 2.7, and Python >= 3.4
+*asammdf* works on Python >= 3.6 (for Python 2.7, 3.4 and 3.5 see the 4.x.y releases)
 
-*asammdf* was tested succesfully on both Linux and Windows
 
 </p>
 
-<img align=left src="https://raw.githubusercontent.com/danielhrisca/asammdf/development/gui.png"/>
+<img align=left src="https://raw.githubusercontent.com/danielhrisca/asammdf/master/gui.png"/>
 
 
 # Status
 
-! | Travis CI  | Coverage  |  Codacy  | ReadTheDocs
---|--|--|--|--
-master | [![Build Status](https://travis-ci.org/danielhrisca/asammdf.svg?branch=master)](https://travis-ci.org/danielhrisca/asammdf) | [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/a3da21da90ca43a5b72fc24b56880c99?branch=master)](https://www.codacy.com/app/danielhrisca/asammdf?utm_source=github.com&utm_medium=referral&utm_content=danielhrisca/asammdf&utm_campaign=Badge_Coverage) | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/a3da21da90ca43a5b72fc24b56880c99?branch=master)](https://www.codacy.com/app/danielhrisca/asammdf?utm_source=github.com&utm_medium=referral&utm_content=danielhrisca/asammdf&utm_campaign=badger) |  [![Documentation Status](http://readthedocs.org/projects/asammdf/badge/?version=master)](http://asammdf.readthedocs.io/en/master/?badge=stable) |
-development| [![Build Status](https://travis-ci.org/danielhrisca/asammdf.svg?branch=development)](https://travis-ci.org/danielhrisca/asammdf) | [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/a3da21da90ca43a5b72fc24b56880c99?branch=development)](https://www.codacy.com/app/danielhrisca/asammdf?utm_source=github.com&utm_medium=referral&utm_content=danielhrisca/asammdf&utm_campaign=Badge_Coverage) | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/a3da21da90ca43a5b72fc24b56880c99?branch=development)](https://www.codacy.com/app/danielhrisca/asammdf?utm_source=github.com&utm_medium=referral&utm_content=danielhrisca/asammdf&utm_campaign=badger) | [![Documentation Status](http://readthedocs.org/projects/asammdf/badge/?version=development)](http://asammdf.readthedocs.io/en/development/?badge=stable) |
+! | Travis CI  | Appveyor | CoverAlls  |  Codacy  | ReadTheDocs 
+--|--|--|--|--|--
+master | [![Build Status](https://travis-ci.org/danielhrisca/asammdf.svg?branch=)](https://travis-ci.org/danielhrisca/asammdf) | [![Build status](https://ci.appveyor.com/api/projects/status/racx048r4cnwa2lg/branch/master?svg=true)](https://ci.appveyor.com/project/danielhrisca/asammdf/branch/master) | [![Coverage Status](https://coveralls.io/repos/github/danielhrisca/asammdf/badge.svg?branch=master)](https://coveralls.io/github/danielhrisca/asammdf?branch=master) | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/a3da21da90ca43a5b72fc24b56880c99?branch=master)](https://www.codacy.com/app/danielhrisca/asammdf?utm_source=github.com&utm_medium=referral&utm_content=danielhrisca/asammdf&utm_campaign=badger) |  [![Documentation Status](http://readthedocs.org/projects/asammdf/badge/?version=master)](http://asammdf.readthedocs.io/en/master/?badge=stable) | 
 
 PyPI| conda-forge
 --|--
@@ -41,10 +39,11 @@ The main goals for this library are:
 * append new channels
 * read unsorted MDF v3 and v4 files
 * read CAN bus logging files
+* extract CAN signals from anonymous CAN bus logging measurements
 * filter a subset of channels from original mdf file
 * cut measurement to specified time interval
 * convert to different mdf version
-* export to pandas, Excel, HDF5, Matlab (v4, v5 and v7.3),CSV and parquet
+* export to HDF5, Matlab (v4, v5 and v7.3), CSV and parquet
 * merge multiple files sharing the same internal structure
 * read and save mdf version 4.10 files containing zipped data blocks
 * space optimizations for saved files (no duplicated blocks)
@@ -60,7 +59,7 @@ The main goals for this library are:
         * 2 - look-up
 
 * add and extract attachments for mdf version 4
-* handle large files (for example merging two fileas, each with 14000 channels and 5GB size, on a RaspberryPi) using *memory* = *minimum* argument
+* handle large files (for example merging two fileas, each with 14000 channels and 5GB size, on a RaspberryPi)
 * extract channel data, master channel and extra channel information as *Signal* objects for unified operations with v3 and v4 files
 * time domain operation using the *Signal* class
 
@@ -78,10 +77,12 @@ The main goals for this library are:
 
 * for version 4
 
+    * experiemental support for MDF v4.20 column oriented storage
     * functionality related to sample reduction block: the samples reduction blocks are simply ignored
     * handling of channel hierarchy: channel hierarchy is ignored
     * full handling of bus logging measurements: currently only CAN bus logging is implemented with the
-      ability to *get* signals defined in the attached CAN database (.arxml or .dbc)
+      ability to *get* signals defined in the attached CAN database (.arxml or .dbc). Signals can also
+      be extracted from an anonymous CAN logging measurement by providing a CAN database (.dbc or .arxml)
     * handling of unfinished measurements (mdf 4): warnings are logged based on the unfinished status flags
       but no further steps are taken to sanitize the measurement
     * full support for remaining mdf 4 channel arrays types
@@ -108,7 +109,7 @@ short = mdf.filter(important_signals).cut(start=10, stop=12)
 short.convert('4.10').save('important signals.mf4')
 
 # plot some channels from a huge file
-efficient = MDF('huge.mf4', , memory='minimum')
+efficient = MDF('huge.mf4')
 for signal in efficient.select(['Sensor1', 'Voltage3']):
    signal.plot()
 ```
@@ -116,23 +117,36 @@ for signal in efficient.select(['Sensor1', 'Voltage3']):
 Check the *examples* folder for extended usage demo, or the documentation
 http://asammdf.readthedocs.io/en/master/examples.html
 
+https://canlogger.csselectronics.com/canedge-getting-started/log-file-tools/asammdf-api/
+
+
 # Documentation
 http://asammdf.readthedocs.io/en/master
 
-# Contributing
+And a nicely written tutorial on the [CSS Electronics site](https://canlogger.csselectronics.com/canedge-getting-started/log-file-tools/asammdf-gui/)
+
+# Contributing & Support
 Please have a look over the [contributing guidelines](CONTRIBUTING.md)
+
+If you enjoy this library please consider making a donation to the
+[numpy project](https://www.flipcause.com/secure/cause_pdetails/MzUwMQ==).
 
 ## Contributors
 Thanks to all who contributed with commits to *asammdf*:
 * Julien Grave [JulienGrv](https://github.com/JulienGrv)
 * Jed Frey [jed-frey](https://github.com/jed-frey)
 * Mihai [yahym](https://github.com/yahym)
-* Jack Weinstein [jacklev](https://github.com/jacklev)
+* Jack Weinstein [jackjweinstein](https://github.com/jackjweinstein)
 * Isuru Fernando [isuruf](https://github.com/isuruf)
 * Felix Kohlgrüber [fkohlgrueber](https://github.com/fkohlgrueber)
 * Stanislav Frolov [stanifrolov](https://github.com/stanifrolov)
 * Thomas Kastl [kasuteru](https://github.com/kasuteru)
 * venden [venden](https://github.com/venden)
+* Marat K. [kopytjuk](https://github.com/kopytjuk>)
+* freakatzz [freakatzz](https://github.com/freakatzz)
+* Martin Falch [MartinF](https://github.com/MatinF)
+* dxpke [dxpke](https://github.com/dxpke)
+* Nick James [driftregion](https://github.com/driftregion)
 
 # Installation
 *asammdf* is available on
@@ -143,6 +157,8 @@ Thanks to all who contributed with commits to *asammdf*:
 
 ```shell
 pip install asammdf
+# for the GUI 
+pip install asammdf[gui]
 # or for anaconda
 conda install -c conda-forge asammdf
 ```
@@ -152,25 +168,27 @@ asammdf uses the following libraries
 
 * numpy : the heart that makes all tick
 * numexpr : for algebraic and rational channel conversions
-* matplotlib : for Signal plotting
 * wheel : for installation in virtual environments
 * pandas : for DataFrame export
 * canmatrix : to handle CAN bus logging measurements
+* natsort
+* cChardet : to detect non-standard unicode encodings
+* lxml : for canmatrix arxml support
+* lz4 : to speed up the disk IO peformance
 
 optional dependencies needed for exports
 
 * h5py : for HDF5 export
-* xlsxwriter : for Excel export
 * scipy : for Matlab v4 and v5 .mat export
 * hdf5storage : for Matlab v7.3 .mat export
 * fastparquet : for parquet export
 
 other optional dependencies
 
-* chardet : to detect non-standard unicode encodings
-* PyQt4 or PyQt5 : for GUI tool
-* pyqtgraph : for GUI tool
+* PyQt5 : for GUI tool
+* pyqtgraph : for GUI tool and Signal plotting (preferably the latest develop branch code)
+* matplotlib : as fallback for Signal plotting
 
 # Benchmarks
 
-http://asammdf.readthedocs.io/en/develoment/benchmarks.html
+http://asammdf.readthedocs.io/en/master/benchmarks.html

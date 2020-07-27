@@ -6,6 +6,16 @@ __pycache__/
 # C extensions
 *.so
 
+# MDF files
+*.mf4
+*.mdf
+*.bak
+*.zip
+*.dsp
+*.a2l
+
+test/proxy.py
+
 # Distribution / packaging
 .Python
 env/
@@ -105,3 +115,7 @@ canape*.ini
 
 _build/
 debug/
+*.txt
+/asammdf/gui/ssss.txt
+/asammdf/gui/ddsd.csv
+/.tgitconfig
